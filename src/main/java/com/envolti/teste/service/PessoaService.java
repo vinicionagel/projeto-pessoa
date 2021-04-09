@@ -22,9 +22,18 @@ public class PessoaService {
     private final PessoaMapper pessoaMapper = PessoaMapper.INSTANCE;
 
     public PessoaDTO createPessoa(PessoaDTO pessoaDTO) throws PessoaAlreadyRegisteredException {
-        verifyIfIsAlreadyRegistered(pessoaDTO.getNome());
+        verifyIfIsAlreadyRegistered(pessoaDTO.getCpf(), null);
         Pessoa beer = pessoaMapper.toModel(pessoaDTO);
         Pessoa savedBeer = pessoaRepository.save(beer);
+        return pessoaMapper.toDTO(savedBeer);
+    }
+
+    public PessoaDTO update(PessoaDTO pessoaDTO, Long id) throws PessoaAlreadyRegisteredException, PessoaNotFoundException {
+        verifyIfExists(id);
+        verifyIfIsAlreadyRegistered(pessoaDTO.getCpf(), id);
+        pessoaDTO.setId(id);
+        Pessoa pessoa = pessoaMapper.toModel(pessoaDTO);
+        Pessoa savedBeer = pessoaRepository.save(pessoa);
         return pessoaMapper.toDTO(savedBeer);
     }
 
@@ -46,9 +55,9 @@ public class PessoaService {
         pessoaRepository.deleteById(id);
     }
 
-    private void verifyIfIsAlreadyRegistered(String cpf) throws PessoaAlreadyRegisteredException {
+    private void verifyIfIsAlreadyRegistered(String cpf, Long id) throws PessoaAlreadyRegisteredException {
         Optional<Pessoa> optSavedBeer = pessoaRepository.findByCpf(cpf);
-        if (optSavedBeer.isPresent()) {
+        if (optSavedBeer.isPresent() && !optSavedBeer.get().getId().equals(id)) {
             throw new PessoaAlreadyRegisteredException(cpf);
         }
     }

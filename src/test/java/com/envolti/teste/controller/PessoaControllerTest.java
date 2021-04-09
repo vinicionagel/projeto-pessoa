@@ -15,6 +15,7 @@ import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -73,6 +74,20 @@ public class PessoaControllerTest {
                 .andExpect(jsonPath(JSON_NOME, is(pessoaDTO.getNome())))
                 .andExpect(jsonPath(JSON_EMAIL, is(pessoaDTO.getEmail())))
                 .andExpect(MockMvcResultMatchers.jsonPath(JSON_SEXO, Is.is(pessoaDTO.getSexo().toString())));
+    }
+
+    @Test
+    void whenPUTIsCalledThenAPessoaIsUpdate() throws Exception {
+        // given
+        PessoaDTO pessoaDTO = PessoaDTOBuilder.builder().build().toPessoaDTO();
+
+        // when
+        when(pessoaService.update(pessoaDTO, 1l)).thenReturn(pessoaDTO);
+
+        // then
+        MockHttpServletRequestBuilder bodyBuilder = MockMvcRequestBuilders.put(PESSOA_API_URL_PATH + "/" + 1).contentType(MediaType.APPLICATION_JSON).content(asJsonString(pessoaDTO));
+        mockMvc.perform(bodyBuilder).andExpect(status().isOk()).andExpect(jsonPath(JSON_NOME, is(pessoaDTO.getNome()))).andExpect(jsonPath(JSON_NOME, is(pessoaDTO.getNome())))
+                .andExpect(jsonPath(JSON_EMAIL, is(pessoaDTO.getEmail())));
     }
 
     @Test
