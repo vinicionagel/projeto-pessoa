@@ -46,7 +46,7 @@ http://localhost:8080/api/v1/pessoas
 <h3>Para subir a aplicação com docker:<h3>
 
 ```
-docker run...
+docker-compose up
 ```
 
 <h3> Documentação da API: </h3>
